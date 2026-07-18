@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+output/
+notebooks/.ipynb_checkpoints/
+spark-warehouse/
+metastore_db/
+derby.log
+*.pyc
+*.crc
+.DS_Store
