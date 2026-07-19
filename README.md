@@ -6,18 +6,16 @@ This repository implements the assignment as a reusable **PySpark medallion
 pipeline**. It runs locally with the supplied sample and the same application
 can run on a managed Spark service when given Spark-supported S3 paths.
 
-The executable version uses Parquet locally and writes the same consolidated
-datasets to S3 through Spark's S3A connector. A deployable Airflow 3 DAG waits
-for the daily S3 object, launches the idempotent Spark application, retries
-failed submissions with bounded exponential backoff and sends structured
-failure/recovery webhook events.
-Credentials and platform connection details remain outside application code.
+The executable pipeline uses Parquet locally and supports S3 through Spark’s S3A connector.
+An optional Airflow 3 reference DAG illustrates how a production orchestrator could wait for a daily S3 object, 
+submit the idempotent Spark application, apply bounded retries, and trigger failure or recovery notifications. 
+The Airflow workflow is provided as an architectural example and was not deployed or executed as part of this submission.
 
 The reference architecture explicitly separates the **Pipeline Control Plane**
 (orchestration, quality, monitoring and reconciliation) from the **Medallion
 Data Plane** (Bronze, Silver and Gold on object storage). The control plane
-governs the medallion flow; it is not an additional data layer. See
-`docs/architecture.md` for the implementation-versus-target mapping.
+governs the medallion flow; it is not an additional data layer. 
+See the [architecture documentation](docs/architecture.md) for the implementation-versus-target mapping. 
 
 ## Storage model
 
@@ -36,10 +34,9 @@ output/
     ├── processing_manifest/
     └── hourly_anomalies/
 ```
-
 Input and output roots are configurable. They may be local folders, HDFS
-locations, or S3 URIs supported by the supplied Spark runtime. See
-`docs/s3_deployment.md` for the concrete S3 prefix mapping.
+locations, or S3 URIs supported by the supplied Spark runtime. See the
+[S3 deployment guide](docs/s3_deployment.md) for the concrete S3 prefix mapping.
 
 ## Project structure
 
@@ -59,7 +56,7 @@ telecom-network-metrics-pipeline/
 ├── mock_tables/                  # requested mock layer views
 ├── notebooks/
 │   └── 01_end_to_end_demo.ipynb # runnable reviewer walkthrough
-├── orchestration/airflow/       # deployable S3 sensor + Spark DAG
+├── orchestration/airflow/  # optional orchestration reference
 ├── sample_data/
 │   └── network_metrics_20250723.csv
 ├── scripts/
@@ -254,10 +251,12 @@ Spark exit status / DQ event -> orchestrator -> SNS or event bus -> on-call + Te
   runbook link in every notification;
 - send one recovery notification when a retry succeeds.
 
-See `orchestration/airflow/dags/network_metrics_pipeline.py` and
-`docs/orchestration.md`. A configured webhook can target a Teams workflow or an
-enterprise alert relay; without one, the same JSON is emitted as an
-`ALERT_EVENT` log.
+An optional [Airflow reference DAG](orchestration/airflow/dags/network_metrics_pipeline.py)
+illustrates the production alerting integration. See the
+[orchestration documentation](docs/orchestration.md) for details. In a configured
+deployment, the webhook can target a Teams workflow or enterprise alert relay.
+Without a webhook URL, the same structured JSON is emitted as an `ALERT_EVENT` log.
+The Airflow workflow was not deployed or executed as part of this submission.
 
 ## Running locally
 
@@ -329,14 +328,14 @@ spark-submit src/network_metrics/main.py \
   --processing-date 2025-07-23 \
   --stage all
 ```
-
-For S3, `config/pipeline.s3.example.json` contains the one-bucket layout used for
-the validated assessment run. Replace the bucket name if deploying to another
-AWS account and supply the compatible S3A connector through the Spark runtime.
-The application contains no cloud credentials, workspace URLs or cluster
-definitions. The exact Windows procedure is documented in
-`docs/s3_operations_runbook.md`; the portable deployment mapping is in
-`docs/s3_deployment.md`.
+For S3, the [example S3 configuration](config/pipeline.s3.example.json) contains
+the one-bucket layout used for the assessment scenario. Replace the bucket name
+when deploying to another AWS account and supply a compatible S3A connector
+through the Spark runtime. The application contains no cloud credentials,
+workspace URLs or cluster definitions. The Windows procedure is documented in
+the [S3 operations runbook](docs/s3_operations_runbook.md), while the portable
+deployment mapping is covered in the
+[S3 deployment guide](docs/s3_deployment.md).
 
 ## Tests
 
