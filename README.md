@@ -2,20 +2,39 @@
 
 ## Scope
 
-This repository implements the assignment as a reusable **PySpark medallion
-pipeline**. It runs locally with the supplied sample and the same application
-can run on a managed Spark service when given Spark-supported S3 paths.
+This repository implements an end-to-end network performance metrics pipeline
+using PySpark and the Medallion architecture. It ingests raw cell-tower metrics
+from CSV files, applies schema and data-quality validation, creates Bronze and
+Silver datasets, and publishes hourly and daily regional metrics in the Gold
+layer. Pipeline runs, quality results and detected anomalies are also persisted
+for operational monitoring.
 
-The executable pipeline uses Parquet locally and supports S3 through Spark’s S3A connector.
-An optional Airflow 3 reference DAG illustrates how a production orchestrator could wait for a daily S3 object, 
-submit the idempotent Spark application, apply bounded retries, and trigger failure or recovery notifications. 
-The Airflow workflow is provided as an architectural example and was not deployed or executed as part of this submission.
+The pipeline runs locally using the supplied sample data and Parquet storage.
+Its configurable input and output paths also support S3 through Spark’s S3A
+connector, allowing the same application to be deployed on a compatible managed
+Spark platform.
 
-The reference architecture explicitly separates the **Pipeline Control Plane**
-(orchestration, quality, monitoring and reconciliation) from the **Medallion
-Data Plane** (Bronze, Silver and Gold on object storage). The control plane
-governs the medallion flow; it is not an additional data layer. 
-See the [architecture documentation](docs/architecture.md) for the implementation-versus-target mapping. 
+An optional Airflow 3 reference DAG illustrates how a production orchestrator
+could wait for a daily S3 object, submit the idempotent Spark application, apply
+bounded retries and trigger failure or recovery notifications. Airflow is not
+required to run the pipeline, and the reference DAG was not deployed or executed
+as part of this submission.
+
+## Architecture
+
+The architecture separates the **Pipeline Control Plane**—orchestration, data
+quality, monitoring and reconciliation—from the **Medallion Data Plane**—Bronze,
+Silver and Gold datasets stored on object storage. The control plane governs and
+observes the data flow; it is not an additional data layer.
+
+[![Network metrics pipeline architecture](docs/network_metrics_reference_architecture.png)](docs/network_metrics_reference_architecture.png)
+
+*Figure 1: Reference architecture for the network metrics pipeline. Select the
+image to view it at full size.*
+
+See the [architecture documentation](docs/architecture.md) for detailed design
+decisions and the mapping between implemented components and potential
+production extensions.
 
 ## Storage model
 
