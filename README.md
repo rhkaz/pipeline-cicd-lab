@@ -69,7 +69,6 @@ telecom-network-metrics-pipeline/
 │   ├── assignment_compliance.md
 │   ├── s3_deployment.md
 │   ├── s3_operations_runbook.md
-│   ├── submission_guide.md
 │   └── operations_runbook.md
 ├── logs/                         # example validation logs
 ├── mock_tables/                  # requested mock layer views
