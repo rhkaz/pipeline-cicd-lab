@@ -1,0 +1,79 @@
+name: Promote network pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  ci:
+    name: Code quality and unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install project
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Unit tests
+        run: pytest -q
+
+  development:
+    name: Development pipeline
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run development deployment
+        run: |
+          echo "Deploy using ${{ vars.PIPELINE_CONFIG }}"
+          # Trigger the development Spark job here
+
+  test:
+    name: Test pipeline
+    needs: development
+    runs-on: ubuntu-latest
+    environment: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run integration tests
+        run: |
+          echo "Test using ${{ vars.PIPELINE_CONFIG }}"
+          # Trigger pipeline and verify reconciliation here
+
+  production:
+    name: Production pipeline
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy production
+        run: |
+          echo "Deploy using ${{ vars.PIPELINE_CONFIG }}"
+          # Trigger the production Spark job here

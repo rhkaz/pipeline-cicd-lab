@@ -1,0 +1,13 @@
+{
+  "input_path": "sample_data",
+  "output_root": "output",
+  "processing_date": "2025-07-23",
+  "timezone": "UTC",
+  "signal_strength_min": -140.0,
+  "signal_strength_max": -20.0,
+  "invalid_rate_warning_threshold": 0.001,
+  "invalid_rate_failure_threshold": 0.01,
+  "anomaly_lookback_days": 28,
+  "anomaly_min_history": 7,
+  "anomaly_mad_threshold": 6.0
+}
