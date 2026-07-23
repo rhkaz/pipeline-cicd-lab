@@ -47,7 +47,7 @@ jobs:
     name: Development pipeline
     needs: ci
     runs-on: ubuntu-latest
-    environment: development
+    environment: dev
 
     steps:
       - name: Check out repository
@@ -83,7 +83,7 @@ jobs:
     name: Production pipeline
     needs: test
     runs-on: ubuntu-latest
-    environment: production
+    environment: prod
 
     steps:
       - name: Check out repository
